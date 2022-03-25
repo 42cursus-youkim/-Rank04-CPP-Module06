@@ -13,11 +13,7 @@ $(NAME): $(OBJ)
 all: $(NAME)
 re: clean all
 run: all
-	@for value in a 0 42; do\
-		echo with $$value;\
-		./$(NAME) $$value;\
-	done
-
+	pytest --tests-per-worker auto ./test.py
 
 clean:
 	$(RM) $(wildcard $(OBJ)) $(NAME)

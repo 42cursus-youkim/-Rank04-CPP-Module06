@@ -59,8 +59,26 @@ double Scalar::toDouble() const {
 }
 
 // Overloaded << operator
+#define WhyCantIHaveATemplateInMyLife(name, value)         \
+  do {                                                     \
+    os << name << ": ";                                    \
+    try {                                                  \
+      os << value << "\n";                                 \
+    } catch (Scalar::ImpossibleConversionException & e) {  \
+      os << "impossible\n";                                \
+    } catch (Scalar::NonDisplayableException & e) {        \
+      os << "Non displayable\n";                           \
+    } catch (std::exception & e) {                         \
+      os << "Well that's unexpected:" << e.what() << "\n"; \
+    }                                                      \
+  } while (0)
+;
+
 std::ostream& operator<<(std::ostream& os, const Scalar& scalar) {
-  (void)scalar;
+  WhyCantIHaveATemplateInMyLife("char", scalar.toChar());
+  WhyCantIHaveATemplateInMyLife("int", scalar.toInt());
+  WhyCantIHaveATemplateInMyLife("float", scalar.toFloat());
+  WhyCantIHaveATemplateInMyLife("double", scalar.toDouble());
   return os;
 }
 
