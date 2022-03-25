@@ -1,5 +1,6 @@
 #include "type.hpp"
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <string>
 #include "color.hpp"
@@ -38,4 +39,25 @@ void identify(Base* p) {
   cout << "\n" END;
 }
 
-// void identify(Base& p) {}
+void identify(Base& p) {
+  cout << HMAG "identified ";
+  try {
+    dynamic_cast<A&>(p);
+    cout << classTypeStr[Atype] << END "\n";
+    return;
+  } catch (std::exception& e) {
+  }
+  try {
+    dynamic_cast<B&>(p);
+    cout << classTypeStr[Btype] << END "\n";
+    return;
+  } catch (std::exception& e) {
+  }
+  try {
+    dynamic_cast<C&>(p);
+    cout << classTypeStr[Ctype] << END "\n";
+    return;
+  } catch (std::exception& e) {
+  }
+  cout << "Unknown type\n";
+}

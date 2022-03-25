@@ -1,9 +1,35 @@
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include "color.hpp"
 #include "type.hpp"
 
+using std::cout;
+
 int main() {
-  for (int i = 0; i < 10; i++) {
-    Base* p = generate();
-    identify(p);
-    delete p;
+  {
+    cout << HYEL "[[Pointers]]\n" END;
+    std::srand(std::time(NULL));
+    for (int i = 0; i < 10; i++) {
+      Base* p = generate();
+      identify(p);
+      delete p;
+    }
+  }
+  {
+    cout << HYEL "\n[[References]]\n" END;
+    A a = A();
+    identify(a);
+    B b = B();
+    identify(b);
+    C c = C();
+    identify(c);
+
+    Base& aRef = a;
+    identify(aRef);
+    Base& bRef = b;
+    identify(bRef);
+    Base& cRef = c;
+    identify(cRef);
   }
 }
