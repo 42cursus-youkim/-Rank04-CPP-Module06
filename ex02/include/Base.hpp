@@ -3,7 +3,7 @@
 
 class Base {
  public:
-  virtual ~Base();
+  virtual ~Base(){};
 };
 
 #endif  // __BASE_H__
