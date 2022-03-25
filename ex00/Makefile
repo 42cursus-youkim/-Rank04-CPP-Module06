@@ -13,7 +13,11 @@ $(NAME): $(OBJ)
 all: $(NAME)
 re: clean all
 run: all
-	./$(NAME)
+	@for value in a 0 42; do\
+		echo $$value;\
+		./$(NAME) $$value;\
+	done
+
 
 clean:
 	$(RM) $(wildcard $(OBJ)) $(NAME)

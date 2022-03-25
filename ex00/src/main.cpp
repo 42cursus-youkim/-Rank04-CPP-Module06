@@ -10,5 +10,7 @@ int main(int argc, char* argv[]) {
     cout << "Usage: ./prog.out [scalar value]" << std::endl;
     return 1;
   }
-
+  string value = argv[1];
+  Scalar scalar(value);
+  cout << scalar << "\n";
 }
