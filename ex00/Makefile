@@ -14,7 +14,7 @@ all: $(NAME)
 re: clean all
 run: all
 	@for value in a 0 42; do\
-		echo $$value;\
+		echo with $$value;\
 		./$(NAME) $$value;\
 	done
 
