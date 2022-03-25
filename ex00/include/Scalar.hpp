@@ -41,7 +41,6 @@ class Scalar {
   };
 };
 
-
 std::ostream& operator<<(std::ostream& os, const Scalar& scalar);
 
 #endif

@@ -30,6 +30,7 @@ string Scalar::getValue() const {
 // Methods
 char Scalar::toChar() const {
   int i = toInt();
+
   if (i < 0 or 255 < i)
     throw ImpossibleConversionException();
   if (not isprint(i))
@@ -59,26 +60,30 @@ double Scalar::toDouble() const {
 }
 
 // Overloaded << operator
-#define WhyCantIHaveATemplateInMyLife(name, value)         \
-  do {                                                     \
-    os << name << ": ";                                    \
-    try {                                                  \
-      os << value << "\n";                                 \
-    } catch (Scalar::ImpossibleConversionException & e) {  \
-      os << "impossible\n";                                \
-    } catch (Scalar::NonDisplayableException & e) {        \
-      os << "Non displayable\n";                           \
-    } catch (std::exception & e) {                         \
-      os << "Well that's unexpected:" << e.what() << "\n"; \
-    }                                                      \
-  } while (0)
-;
+
+template <typename T>
+std::ostream& pairOutput(std::ostream& os,
+                         string name,
+                         const Scalar& scalar,
+                         T (Scalar::*func)(void) const) {
+  os << name << ": ";
+  try {
+    os << (scalar.*func)() << "\n";
+  } catch (Scalar::ImpossibleConversionException& e) {
+    os << "impossible\n";
+  } catch (Scalar::NonDisplayableException& e) {
+    os << "Non displayable\n";
+  } catch (std::exception& e) {
+    os << "Well that's unexpected:" << e.what() << "\n";
+  };
+  return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const Scalar& scalar) {
-  WhyCantIHaveATemplateInMyLife("char", scalar.toChar());
-  WhyCantIHaveATemplateInMyLife("int", scalar.toInt());
-  WhyCantIHaveATemplateInMyLife("float", scalar.toFloat());
-  WhyCantIHaveATemplateInMyLife("double", scalar.toDouble());
+  pairOutput(os, "char", scalar, &Scalar::toChar);
+  pairOutput(os, "int", scalar, &Scalar::toInt);
+  pairOutput(os, "float", scalar, &Scalar::toFloat);
+  pairOutput(os, "double", scalar, &Scalar::toDouble);
   return os;
 }
 
