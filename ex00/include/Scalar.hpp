@@ -2,10 +2,12 @@
 #define SCALAR_HPP
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "util.hpp"
 
 using std::string;
+using std::stringstream;
 
 class Scalar {
  private:
@@ -28,27 +30,26 @@ class Scalar {
       _doubleValue = static_cast<double>(value);
   }
 
+  // Disabled Members
+  Scalar();
+
  public:
   // Constructors & Destructor
-  Scalar();
-  Scalar(const Scalar& other);
   Scalar(string value);
+  Scalar(const Scalar& other);
+  Scalar& operator=(const Scalar& assign);
   ~Scalar();
 
-  // Operators
-  Scalar& operator=(const Scalar& assign);
-
-  // Getters
-  string getValue() const;
-
   // Methods
-  // char toChar() const;
-  // int toInt() const;
-  // float toFloat() const;
-  // double toDouble() const;
+  string charRepr() const;
+  string intRepr() const;
+  string floatRepr() const;
+  string doubleRepr() const;
+
+  typedef string (Scalar::*reprFunc)() const;
+  string pairOutput(string name, reprFunc func) const;
 
   // Exceptions
-
   class ImpossibleConversionException;
   class NonDisplayableException;
 };

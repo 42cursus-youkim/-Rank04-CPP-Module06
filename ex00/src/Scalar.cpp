@@ -4,13 +4,12 @@
 #include <climits>
 #include <cmath>
 #include <cstdlib>
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include "util.hpp"
 
-// Constructors
-Scalar::Scalar() : _value("error") {}
-
+// Constructors & Destructor
 Scalar::Scalar(const Scalar& other)
     : _value(other._value),
       _type(other._type),
@@ -24,8 +23,6 @@ Scalar::Scalar(string value) : _value(strTrim(value)), _type(findType(value)) {
   std::cout << "type is " << typeStr[_type] << std::endl;
 
   switch (_type) {
-    // TODO: convert isTYPE funcs to toTYPE that throws exception
-    // they will be used on below switch cases
     case intType:
       _intValue = std::strtol(_value.c_str(), NULL, 10);
       castOtherValues(_intValue);
@@ -46,45 +43,74 @@ Scalar::Scalar(string value) : _value(strTrim(value)), _type(findType(value)) {
     default:
       break;
   }
-  std::cout << "int :" << _intValue << "\nchar :" << _charValue
-            << "\nfloat :" << _floatValue << "\ndouble :" << _doubleValue
-            << std::endl;
+  std::cout << *this << std::endl;
 }
 
-// Destructor
 Scalar::~Scalar() {}
 
-// Getters / Setters
-string Scalar::getValue() const {
-  return _value;
+// Operators
+Scalar& Scalar::operator=(const Scalar& assign) {
+  _value = assign._value;
+  _type = assign._type;
+  _charValue = assign._charValue;
+  _intValue = assign._intValue;
+  _floatValue = assign._floatValue;
+  _doubleValue = assign._doubleValue;
+  return *this;
 }
-// // Overloaded << operator
 
-// template <typename T>
-// std::ostream& pairOutput(std::ostream& os,
-//                          string name,
-//                          const Scalar& scalar,
-//                          T (Scalar::*func)(void) const) {
-//   os << name << ": ";
-//   try {
-//     os << (scalar.*func)() << "\n";
-//   } catch (Scalar::ImpossibleConversionException& e) {
-//     os << "impossible\n";
-//   } catch (Scalar::NonDisplayableException& e) {
-//     os << "Non displayable\n";
-//   } catch (std::exception& e) {
-//     os << "Well that's unexpected:" << e.what() << "\n";
-//   };
-//   return os;
-// }
+// Methods
+string Scalar::charRepr() const {
+  if (_value.length() != 1 || !std::isprint(_charValue))
+    throw NonDisplayableException();
+  stringstream ss;
+  ss << "'" << _charValue << "'";
+  return ss.str();
+}
 
-// std::ostream& operator<<(std::ostream& os, const Scalar& scalar) {
-//   pairOutput(os, "char", scalar, &Scalar::toChar);
-//   pairOutput(os, "int", scalar, &Scalar::toInt);
-//   pairOutput(os, "float", scalar, &Scalar::toFloat);
-//   pairOutput(os, "double", scalar, &Scalar::toDouble);
-//   return os;
-// }
+string Scalar::intRepr() const {
+  stringstream ss;
+  ss << _intValue;
+  return ss.str();
+}
+
+string Scalar::floatRepr() const {
+  stringstream ss;
+  ss << std::fixed << std::setprecision(2) << _floatValue << "f";
+  return ss.str();
+}
+
+string Scalar::doubleRepr() const {
+  stringstream ss;
+  ss << std::fixed << std::setprecision(2) << _doubleValue;
+  return ss.str();
+}
+
+string Scalar::pairOutput(string name, reprFunc func) const {
+  stringstream ss;
+
+  ss << name << ": ";
+  try {
+    ss << (this->*func)() << "\n";
+  } catch (Scalar::ImpossibleConversionException& e) {
+    ss << "impossible\n";
+  } catch (Scalar::NonDisplayableException& e) {
+    ss << "Non displayable\n";
+  } catch (std::exception& e) {
+    ss << "Well that's unexpected:" << e.what() << "\n";
+  };
+  return ss.str();
+}
+
+// Overloaded << operator
+std::ostream& operator<<(std::ostream& os, const Scalar& scalar) {
+  const string typeStr[] = {"char", "int", "float", "double"};
+  Scalar::reprFunc funcs[] = {&Scalar::charRepr, &Scalar::intRepr,
+                              &Scalar::floatRepr, &Scalar::doubleRepr};
+  for (int i = 0; i < 4; i++)
+    os << scalar.pairOutput(typeStr[i], funcs[i]);
+  return os;
+}
 
 // Exceptions
 const char* Scalar::ImpossibleConversionException::what() const throw() {
