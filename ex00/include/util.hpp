@@ -6,7 +6,7 @@
 #include <string>
 using std::string;
 
-enum strLiteralType { intType, charType, floatType, doubleType, noneOfAbove };
+enum strLiteralType { intType, charType, floatType, doubleType, errorType };
 
 string strTrim(const string& str);
 strLiteralType findType(const string& str);

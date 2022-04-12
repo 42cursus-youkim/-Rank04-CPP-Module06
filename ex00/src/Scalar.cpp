@@ -1,13 +1,15 @@
 #include "Scalar.hpp"
 #include <cctype>
 #include <cerrno>
-#include <climits>
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include "util.hpp"
+
+using std::string;
 
 // Constructors & Destructor
 Scalar::Scalar(const Scalar& other)
@@ -25,19 +27,29 @@ Scalar::Scalar(string value) : _value(strTrim(value)), _type(findType(value)) {
   switch (_type) {
     case intType:
       _intValue = std::strtol(_value.c_str(), NULL, 10);
+      _rangeFlag = CHAR_MAX < _intValue || _intValue < CHAR_MIN ? BETWEEN_CHAR
+                                                                : BETWEEN_INT;
       castOtherValues(_intValue);
       break;
     case charType:
       _charValue = _value[0];
+      _rangeFlag = BETWEEN_CHAR;
       castOtherValues(_charValue);
       break;
     case floatType:
       _floatValue =
           std::strtof(_value.substr(0, _value.length() - 1).c_str(), NULL);
+      _rangeFlag = INT_MAX < _floatValue || _floatValue < INT_MIN
+                       ? BETWEEN_INT
+                       : BETWEEN_FLOAT;
       castOtherValues(_floatValue);
       break;
     case doubleType:
       _doubleValue = std::strtod(_value.c_str(), NULL);
+      _rangeFlag = std::numeric_limits<float>::min() < _doubleValue ||
+                           _doubleValue < std::numeric_limits<float>::max()
+                       ? BETWEEN_FLOAT
+                       : BETWEEN_DOUBLE;
       castOtherValues(_doubleValue);
       break;
     default:
@@ -59,9 +71,17 @@ Scalar& Scalar::operator=(const Scalar& assign) {
   return *this;
 }
 
+// Getters/Setters
+string Scalar::getValue() const {
+  return _value;
+}
+
 // Methods
 string Scalar::charRepr() const {
-  if (_value.length() != 1 || !std::isprint(_charValue))
+  if (_rangeFlag > BETWEEN_CHAR)
+    throw ImpossibleConversionException();
+  if (_value.length() != 1 || !std::isprint(_charValue) ||
+      !std::isdigit(_charValue))
     throw NonDisplayableException();
   stringstream ss;
   ss << "'" << _charValue << "'";
@@ -69,12 +89,16 @@ string Scalar::charRepr() const {
 }
 
 string Scalar::intRepr() const {
+  if (_rangeFlag > BETWEEN_INT)
+    throw ImpossibleConversionException();
   stringstream ss;
   ss << _intValue;
   return ss.str();
 }
 
 string Scalar::floatRepr() const {
+  if (_rangeFlag > BETWEEN_FLOAT)
+    throw ImpossibleConversionException();
   stringstream ss;
   ss << std::fixed << std::setprecision(2) << _floatValue << "f";
   return ss.str();
@@ -87,18 +111,24 @@ string Scalar::doubleRepr() const {
 }
 
 string Scalar::pairOutput(string name, reprFunc func) const {
+  const string impossible = "impossible";
   stringstream ss;
 
   ss << name << ": ";
-  try {
-    ss << (this->*func)() << "\n";
-  } catch (Scalar::ImpossibleConversionException& e) {
-    ss << "impossible\n";
-  } catch (Scalar::NonDisplayableException& e) {
-    ss << "Non displayable\n";
-  } catch (std::exception& e) {
-    ss << "Well that's unexpected:" << e.what() << "\n";
-  };
+  if (_type == errorType)
+    ss << impossible;
+  else {
+    try {
+      ss << (this->*func)();
+    } catch (Scalar::ImpossibleConversionException& e) {
+      ss << impossible;
+    } catch (Scalar::NonDisplayableException& e) {
+      ss << "Non displayable";
+    } catch (std::exception& e) {
+      ss << "Well that's unexpected:" << e.what();
+    };
+  }
+  ss << "\n";
   return ss.str();
 }
 
@@ -107,8 +137,15 @@ std::ostream& operator<<(std::ostream& os, const Scalar& scalar) {
   const string typeStr[] = {"char", "int", "float", "double"};
   Scalar::reprFunc funcs[] = {&Scalar::charRepr, &Scalar::intRepr,
                               &Scalar::floatRepr, &Scalar::doubleRepr};
-  for (int i = 0; i < 4; i++)
-    os << scalar.pairOutput(typeStr[i], funcs[i]);
+  if (scalar.getValue().find("nan") != string::npos) {
+    os << "char: impossible\n";
+    os << "int: impossible\n";
+    os << "float: nanf\n";
+    os << "double: nan\n";
+  } else {
+    for (int i = 0; i < 4; i++)
+      os << scalar.pairOutput(typeStr[i], funcs[i]);
+  }
   return os;
 }
 

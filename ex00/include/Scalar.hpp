@@ -11,8 +11,16 @@ using std::stringstream;
 
 class Scalar {
  private:
+  enum valueRangeFlag {
+    BETWEEN_CHAR,
+    BETWEEN_INT,
+    BETWEEN_FLOAT,
+    BETWEEN_DOUBLE
+  };
+
   string _value;
   strLiteralType _type;
+  valueRangeFlag _rangeFlag;
   char _charValue;
   int _intValue;
   float _floatValue;
@@ -39,6 +47,9 @@ class Scalar {
   Scalar(const Scalar& other);
   Scalar& operator=(const Scalar& assign);
   ~Scalar();
+
+  // Getters/Setters
+  string getValue() const;
 
   // Methods
   string charRepr() const;

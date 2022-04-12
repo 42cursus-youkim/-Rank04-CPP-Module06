@@ -17,8 +17,8 @@ static bool isInt(const string& str) {
   errno = 0;
   const char* s = str.c_str();
   char* end_str;
-  std::strtol(s, &end_str, 10);
-  return isResultValid(str, end_str);
+  long rep = std::strtol(s, &end_str, 10);
+  return isResultValid(str, end_str) and INT_MIN <= rep && rep <= INT_MAX;
 }
 
 static bool isChar(const string& str) {
@@ -29,7 +29,8 @@ static bool isFloat(const string& str) {
   const string pseudo[] = {"-inff", "+inff"};
   if (strIsOneOf(str, pseudo, 2))
     return true;
-  if (strLast(str) != 'f' or not stringHasNoAlphaExcept(str, "f"))
+  if (str.find('.') == string::npos or strLast(str) != 'f' or
+      not stringHasNoAlphaExcept(str, "f"))
     return false;
 
   errno = 0;
@@ -43,7 +44,8 @@ static bool isDouble(const string& str) {
   const string pseudo[] = {"-inf", "+inf", "nan"};
   if (strIsOneOf(str, pseudo, 3))
     return true;
-  if (strLast(str) == '.' or stringHasAlpha(str))
+  if (str.find('.') == string::npos or strLast(str) == '.' or
+      stringHasAlpha(str))
     return false;
 
   errno = 0;
@@ -60,5 +62,5 @@ strLiteralType findType(const string& str) {
     if (checkFuncs[i](str))
       return (strLiteralType)i;
   }
-  return noneOfAbove;
+  return errorType;
 }
