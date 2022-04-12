@@ -27,34 +27,25 @@ Scalar::Scalar(string value) : _value(strTrim(value)), _type(findType(value)) {
   switch (_type) {
     case intType:
       _intValue = std::strtol(_value.c_str(), NULL, 10);
-      _rangeFlag = CHAR_MAX < _intValue || _intValue < CHAR_MIN ? BETWEEN_CHAR
-                                                                : BETWEEN_INT;
       castOtherValues(_intValue);
       break;
     case charType:
       _charValue = _value[0];
-      _rangeFlag = BETWEEN_CHAR;
       castOtherValues(_charValue);
       break;
     case floatType:
       _floatValue =
           std::strtof(_value.substr(0, _value.length() - 1).c_str(), NULL);
-      _rangeFlag = INT_MAX < _floatValue || _floatValue < INT_MIN
-                       ? BETWEEN_INT
-                       : BETWEEN_FLOAT;
       castOtherValues(_floatValue);
       break;
     case doubleType:
       _doubleValue = std::strtod(_value.c_str(), NULL);
-      _rangeFlag = std::numeric_limits<float>::min() < _doubleValue ||
-                           _doubleValue < std::numeric_limits<float>::max()
-                       ? BETWEEN_FLOAT
-                       : BETWEEN_DOUBLE;
       castOtherValues(_doubleValue);
       break;
     default:
       break;
   }
+
   std::cout << *this << std::endl;
 }
 
@@ -78,10 +69,9 @@ string Scalar::getValue() const {
 
 // Methods
 string Scalar::charRepr() const {
-  if (_rangeFlag > BETWEEN_CHAR)
+  if (_floatValue < 0 or _floatValue > 255)
     throw ImpossibleConversionException();
-  if (_value.length() != 1 || !std::isprint(_charValue) ||
-      !std::isdigit(_charValue))
+  if (not std::isprint(_charValue))
     throw NonDisplayableException();
   stringstream ss;
   ss << "'" << _charValue << "'";
@@ -89,7 +79,8 @@ string Scalar::charRepr() const {
 }
 
 string Scalar::intRepr() const {
-  if (_rangeFlag > BETWEEN_INT)
+  if (_floatValue < std::numeric_limits<int>::lowest() or
+      _floatValue > std::numeric_limits<int>::max())
     throw ImpossibleConversionException();
   stringstream ss;
   ss << _intValue;
@@ -97,16 +88,17 @@ string Scalar::intRepr() const {
 }
 
 string Scalar::floatRepr() const {
-  if (_rangeFlag > BETWEEN_FLOAT)
+  if (_doubleValue < std::numeric_limits<float>::lowest() or
+      _doubleValue > std::numeric_limits<float>::max())
     throw ImpossibleConversionException();
   stringstream ss;
-  ss << std::fixed << std::setprecision(2) << _floatValue << "f";
+  ss << std::fixed << std::setprecision(15) << _floatValue << "f";
   return ss.str();
 }
 
 string Scalar::doubleRepr() const {
   stringstream ss;
-  ss << std::fixed << std::setprecision(2) << _doubleValue;
+  ss << std::fixed << std::setprecision(15) << _doubleValue;
   return ss.str();
 }
 
@@ -142,6 +134,12 @@ std::ostream& operator<<(std::ostream& os, const Scalar& scalar) {
     os << "int: impossible\n";
     os << "float: nanf\n";
     os << "double: nan\n";
+  } else if (scalar.getValue().find("+inff") != string::npos or
+             scalar.getValue().find("-inff") != string::npos) {
+    os << "char: impossible\n";
+    os << "int: impossible\n";
+    os << "float: " << scalar.getValue() << "\n";
+    os << "double: " << scalar.getValue() << "\n";
   } else {
     for (int i = 0; i < 4; i++)
       os << scalar.pairOutput(typeStr[i], funcs[i]);
