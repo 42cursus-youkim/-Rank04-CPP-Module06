@@ -20,7 +20,7 @@ INT_MIN = -2147483648
 
 @given(st.integers())
 def test_handle_int(num: int):
-    args = ["./convert", str(num)]
+    args = ["./prog.out", str(num)]
     result = run(args, capture_output=True)
     if num < INT_MIN or INT_MAX < num:
         assert is_run_raised_exception(result)
