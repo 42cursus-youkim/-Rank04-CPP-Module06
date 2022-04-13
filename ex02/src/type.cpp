@@ -22,7 +22,7 @@ Base* generate(void) {
     case Ctype:
       return new C();
     default:
-      return NULL;
+      throw std::runtime_error("unknown type");
   }
 }
 
@@ -35,29 +35,34 @@ void identify(Base* p) {
   else if (dynamic_cast<C*>(p))
     cout << classTypeStr[Ctype];
   else
-    cout << "Unknown type";
+    cout << RED "Unknown type";
   cout << "\n" END;
 }
 
 void identify(Base& p) {
   cout << HMAG "identified ";
   try {
-    dynamic_cast<A&>(p);
-    cout << classTypeStr[Atype] << END "\n";
-    return;
+    A& a = dynamic_cast<A&>(p);
+    (void)a;
+    cout << classTypeStr[Atype];
+    goto finish;
   } catch (std::exception& e) {
   }
   try {
-    dynamic_cast<B&>(p);
-    cout << classTypeStr[Btype] << END "\n";
-    return;
+    B& b = dynamic_cast<B&>(p);
+    (void)b;
+    cout << classTypeStr[Btype];
+    goto finish;
   } catch (std::exception& e) {
   }
   try {
-    dynamic_cast<C&>(p);
-    cout << classTypeStr[Ctype] << END "\n";
-    return;
+    C& c = dynamic_cast<C&>(p);
+    (void)c;
+    cout << classTypeStr[Ctype];
+    goto finish;
   } catch (std::exception& e) {
   }
-  cout << "Unknown type\n";
+  cout << RED "Unknown type\n";
+finish:
+  cout << END "\n";
 }

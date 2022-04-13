@@ -32,7 +32,9 @@
       "*.lalrpop": "rust",
       "iosfwd": "cpp",
       "string": "cpp",
-      "limits": "cpp"
+      "limits": "cpp",
+      "iostream": "cpp",
+      "exception": "cpp"
     }
   }
 }

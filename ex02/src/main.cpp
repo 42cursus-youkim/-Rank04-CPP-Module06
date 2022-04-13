@@ -18,11 +18,11 @@ int main() {
   }
   {
     cout << HYEL "\n[[References]]\n" END;
-    A a = A();
+    A a;
     identify(a);
-    B b = B();
+    B b;
     identify(b);
-    C c = C();
+    C c;
     identify(c);
 
     Base& aRef = a;
