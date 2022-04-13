@@ -30,7 +30,9 @@
       "*.list": "properties",
       "*.sav": "json",
       "*.lalrpop": "rust",
-      "iosfwd": "cpp"
+      "iosfwd": "cpp",
+      "string": "cpp",
+      "limits": "cpp"
     }
   }
 }

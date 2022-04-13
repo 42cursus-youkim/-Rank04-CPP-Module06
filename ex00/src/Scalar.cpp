@@ -24,6 +24,10 @@ Scalar::Scalar(string value) : _value(strTrim(value)), _type(findType(value)) {
   // const string typeStr[] = {"int", "char", "float", "double", "error"};
   // std::cout << "type is " << typeStr[_type] << std::endl;
 
+  assert(std::numeric_limits<float>::is_iec559);
+  assert(std::numeric_limits<float>::has_quiet_NaN);
+  assert(std::numeric_limits<double>::is_iec559);
+  assert(std::numeric_limits<double>::has_quiet_NaN);
   switch (_type) {
     case intType:
       _intValue = std::strtol(_value.c_str(), NULL, 10);
@@ -34,19 +38,32 @@ Scalar::Scalar(string value) : _value(strTrim(value)), _type(findType(value)) {
       castOtherValues(_charValue);
       break;
     case floatType:
-      _floatValue =
-          std::strtof(_value.substr(0, _value.length() - 1).c_str(), NULL);
+      if (_value == "-inff")
+        _doubleValue = -std::numeric_limits<float>::infinity();
+      else if (_value == "+inff")
+        _doubleValue = std::numeric_limits<float>::infinity();
+      else if (_value == "nanf")
+        _doubleValue = std::numeric_limits<float>::quiet_NaN();
+      else
+        _floatValue =
+            std::strtof(_value.substr(0, _value.length() - 1).c_str(), NULL);
       castOtherValues(_floatValue);
       break;
     case doubleType:
+      if (_value == "-inf")
+        _doubleValue = -std::numeric_limits<double>::infinity();
+      else if (_value == "+inf")
+        _doubleValue = std::numeric_limits<double>::infinity();
+      else if (_value == "nan")
+        _doubleValue = std::numeric_limits<double>::quiet_NaN();
+      else
+        _doubleValue = std::strtod(_value.c_str(), NULL);
       _doubleValue = std::strtod(_value.c_str(), NULL);
       castOtherValues(_doubleValue);
       break;
     default:
       break;
   }
-
-  std::cout << *this << std::endl;
 }
 
 Scalar::~Scalar() {}
@@ -129,13 +146,12 @@ std::ostream& operator<<(std::ostream& os, const Scalar& scalar) {
   const string typeStr[] = {"char", "int", "float", "double"};
   Scalar::reprFunc funcs[] = {&Scalar::charRepr, &Scalar::intRepr,
                               &Scalar::floatRepr, &Scalar::doubleRepr};
-  if (scalar.getValue().find("nan") != string::npos) {
+  if (scalar.getValue() == "nanf" or scalar.getValue() == "nan") {
     os << "char: impossible\n";
     os << "int: impossible\n";
     os << "float: nanf\n";
     os << "double: nan\n";
-  } else if (scalar.getValue().find("+inff") != string::npos or
-             scalar.getValue().find("-inff") != string::npos) {
+  } else if (scalar.getValue() == "+inff" or scalar.getValue() == "-inff") {
     os << "char: impossible\n";
     os << "int: impossible\n";
     os << "float: " << scalar.getValue() << "\n";

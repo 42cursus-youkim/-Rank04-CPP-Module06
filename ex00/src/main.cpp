@@ -12,5 +12,5 @@ int main(int argc, char* argv[]) {
   }
   string value = argv[1];
   Scalar scalar(value);
-  // cout << scalar << "\n";
+  cout << scalar << "\n";
 }

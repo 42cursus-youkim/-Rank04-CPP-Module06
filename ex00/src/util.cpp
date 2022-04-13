@@ -32,6 +32,9 @@ static bool isFloat(const string& str) {
   if (str.find('.') == string::npos or strLast(str) != 'f' or
       not stringHasNoAlphaExcept(str, "f"))
     return false;
+  const size_t pos = str.find_last_not_of('f');
+  if (pos != string::npos and not(isdigit(str.at(pos))))
+    return false;
 
   errno = 0;
   char* end_str;
