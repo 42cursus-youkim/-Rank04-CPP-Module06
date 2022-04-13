@@ -28,7 +28,9 @@ Base* generate(void) {
 
 void identify(Base* p) {
   cout << HMAG "identified ";
-  if (dynamic_cast<A*>(p))
+  if (p == NULL)
+    cout << RED "(NULL)";
+  else if (dynamic_cast<A*>(p))
     cout << classTypeStr[Atype];
   else if (dynamic_cast<B*>(p))
     cout << classTypeStr[Btype];

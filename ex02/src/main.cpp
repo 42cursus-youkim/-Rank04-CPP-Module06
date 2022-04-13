@@ -15,6 +15,8 @@ int main() {
       identify(p);
       delete p;
     }
+    cout << HYEL "[[Null Pointer]]\n" END;
+    identify(NULL);
   }
   {
     cout << HYEL "\n[[References]]\n" END;
