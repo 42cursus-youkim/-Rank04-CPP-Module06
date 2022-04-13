@@ -1,5 +1,5 @@
 # C compiled binary
-./convert
+convert
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
