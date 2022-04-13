@@ -21,8 +21,8 @@ Scalar::Scalar(const Scalar& other)
       _doubleValue(other._doubleValue) {}
 
 Scalar::Scalar(string value) : _value(strTrim(value)), _type(findType(value)) {
-  const string typeStr[] = {"int", "char", "float", "double", "error"};
-  std::cout << "type is " << typeStr[_type] << std::endl;
+  // const string typeStr[] = {"int", "char", "float", "double", "error"};
+  // std::cout << "type is " << typeStr[_type] << std::endl;
 
   switch (_type) {
     case intType:

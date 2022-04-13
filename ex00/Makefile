@@ -13,7 +13,13 @@ $(NAME): $(OBJ)
 all: $(NAME)
 re: clean all
 run: all
-	pytest --tests-per-worker auto ./test.py
+	@for num in '0' 'nan' '42.0f'; do\
+		echo [[case $$num]];\
+		./$(NAME) $$num;\
+	done
+
+test: all
+	pytest --tests-per-worker auto
 
 clean:
 	$(RM) $(wildcard $(OBJ)) $(NAME)

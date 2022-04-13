@@ -1,13 +1,36 @@
 {
-	"folders": [
-		{
-			"path": "ex00"
-		},
-		{
-			"path": "ex01"
-		},
-		{
-			"path": "ex02"
-		}
-	]
+  "folders": [
+    {
+      "path": "ex00"
+    },
+    {
+      "path": "ex01"
+    },
+    {
+      "path": "ex02"
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "**/*.pug": "jade",
+      "**/*.h": "c",
+      "**/*.c": "c",
+      "**/*.cpp": "cpp",
+      "**/*.html": "html",
+      "**/templates/**/*.html": "django-html",
+      "**/templates/**/*.css": "css",
+      "**/requirements{/**,*}.{txt,in}": "pip-requirements",
+      "*.html": "html",
+      "*.xpm": "c",
+      "*.h": "c",
+      "*.hpp": "cpp",
+      "*.njk": "nunjucks",
+      "**/templates/**/*": "django-txt",
+      "*.pug": "jade",
+      "*.list": "properties",
+      "*.sav": "json",
+      "*.lalrpop": "rust",
+      "iosfwd": "cpp"
+    }
+  }
 }
